@@ -9,8 +9,8 @@ export const store = configureStore({
     reducer: rootReducer,
     middleware: (getDefault) =>
         getDefault({
-            thunk: false,          // important: you’re using sagas, not thunk
-            serializableCheck: false, // often easier with errors, dates, etc.
+            thunk: false,
+            serializableCheck: false,
         }).concat(sagaMiddleware),
 });
 

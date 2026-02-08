@@ -5,6 +5,7 @@ import {
 } from "react-router-dom";
 import AppLayout from '../layouts/AppLayout';
 import Home from '../pages/Home/Home';
+import Register from "../pages/Register/register";
 
 export default function AppRoutes() {
     return (
