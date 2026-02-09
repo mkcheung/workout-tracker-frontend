@@ -55,7 +55,11 @@ export const authSlice = createSlice({
             state.status = 'loading'
             state.error = null
         },
-        logout: (state) => {
+        logoutRequested(state) {
+            state.status = 'idle'
+            state.error = null
+        },
+        logoutSucceeded: (state) => {
             state.token = null
             state.user = null
             state.status = 'idle'

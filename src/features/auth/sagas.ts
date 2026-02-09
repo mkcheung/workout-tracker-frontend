@@ -1,6 +1,8 @@
 import { call, put, takeLatest } from "redux-saga/effects";
 import { authActions } from "./slice";
+import { uiActions } from "../ui/uiSlice";
 import client from "../../api/client";
+import { loginMessages } from "../ui/toastMessages";
 
 function* loginWorker(action: ReturnType<typeof authActions.loginRequest>) {
     try {
@@ -27,17 +29,18 @@ function* rehydrateWorker() {
     if (token) {
         yield put(authActions.loginStorage({ token }));
     } else {
-        yield put(authActions.logout());
+        yield put(authActions.logoutRequested());
     }
 }
 
 function* logoutWorker() {
     localStorage.removeItem("token");
-    // you can also clear other slices here later if needed
+    yield put(authActions.logoutSucceeded())
+    yield put(uiActions.toastAdded({ kind: 'success', message: loginMessages.loggedOut }))
 }
 
 export function* authRootSaga() {
     yield takeLatest(authActions.loginRequest.type, loginWorker);
     yield takeLatest(authActions.rehydrate.type, rehydrateWorker);
-    yield takeLatest(authActions.logout.type, logoutWorker);
+    yield takeLatest(authActions.logoutRequested.type, logoutWorker);
 }

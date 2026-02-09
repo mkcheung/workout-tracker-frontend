@@ -1,8 +1,18 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-
+import { authActions } from "../../features/auth/slice";
+import { useAppDispatch, useAppSelector } from "../hooks";
 export default function AppLayout() {
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+
+    const status = useAppSelector((s) => s.auth.status);
+    const user = useAppSelector((s) => s.auth.user);
     const isAuthed = status === "authenticated";
 
+    const logout = () => {
+        dispatch(authActions.logoutRequested());
+        navigate("/login", { replace: true });
+    };
     return (
         <div className="app">
             <header className="topbar">
@@ -27,6 +37,17 @@ export default function AppLayout() {
                     </nav>
 
                     <div style={{ flex: 1 }} />
+
+                    <div className="topbarRight">
+                        {isAuthed && (
+                            <>
+                                <span className="mutedText">{user?.email}</span>
+                                <button className="btn btnGhost" onClick={logout}>
+                                    Logout
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
             </header>
 
