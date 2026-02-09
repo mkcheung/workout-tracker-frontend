@@ -8,7 +8,7 @@ import type {
 
 type AuthStatus = 'idle' | 'loading' | 'authenticated' | 'error'
 
-type User = {
+export type User = {
     id: number;
     email: string;
     username: string;
@@ -53,6 +53,10 @@ export const authSlice = createSlice({
         },
         rehydrate: (state) => {
             state.status = 'loading'
+            state.error = null
+        },
+        rehydrateFailed: (state) => {
+            state.status = 'idle'
             state.error = null
         },
         logoutRequested(state) {
