@@ -3,8 +3,13 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { validateEmail } from "../../shared/utils/helper";
 import client from "../../../api/client";
-
+import { useAppDispatch } from "../../hooks";
+import { uiActions } from "../../../features/ui/uiSlice";
+import { loginMessages } from "../../../features/ui/toastMessages";
+import { setToken } from "../../../shared/auth/token";
 export const Register = () => {
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const [formData, setFormData] = useState({
         first_name: '',
         last_name: '',
@@ -16,8 +21,17 @@ export const Register = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const validEmail = validateEmail(formData.email)
+        const emailValid = validateEmail(formData.email)
         const pwMatch = formData.password !== "" && formData.password === formData.password_confirm;
+
+        if (!emailValid) {
+            dispatch(uiActions.toastAdded({ kind: "error", message: "Email format is invalid." }));
+            return;
+        }
+        if (!pwMatch) {
+            dispatch(uiActions.toastAdded({ kind: "error", message: "Passwords must match." }));
+            return;
+        }
 
         try {
             const res = await client.request({
@@ -25,9 +39,17 @@ export const Register = () => {
                 url: "api/auth/register/",
                 data: formData,
             });
+            if (res.status === 201) {
+                setToken(res.data.token);
+                dispatch(uiActions.toastAdded({ kind: "success", message: loginMessages.registered }));
+                navigate("/login")
+            } else {
+                dispatch(uiActions.toastAdded({ kind: "error", message: "Registration failed." }));
+            }
         } catch (e: any) {
             const message =
                 e?.normalized?.message || e?.message || "Registration failed.";
+            dispatch(uiActions.toastAdded({ kind: "error", message: `${message}` }));
         }
     }
 

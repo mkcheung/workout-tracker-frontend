@@ -4,19 +4,17 @@ import client from "../../api/client";
 
 function* loginWorker(action: ReturnType<typeof authActions.loginRequest>) {
     try {
-        const { usernameOrEmail, password } = action.payload;
+        const { username, password } = action.payload;
 
-        // adjust endpoint to your backend route (example: /api/auth/login/)
         const res: { data: { token: string; user?: any } } = yield call(client.request, {
             method: "POST",
             url: "/api/auth/login/",
-            data: { username: usernameOrEmail, password },
+            data: { username: username, password },
         });
 
         const { token, user } = res.data;
         localStorage.setItem("token", token);
         yield put(authActions.loginStorage({ token, user }));
-        // navigation can be done here if you keep nav in sagas (per spec)
     } catch (e: any) {
         const message =
             e?.normalized?.message || e?.message || "Login failed. Please try again.";

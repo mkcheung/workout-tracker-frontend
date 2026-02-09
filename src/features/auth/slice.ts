@@ -36,7 +36,7 @@ export const authSlice = createSlice({
     reducers: {
         loginRequest: (
             state,
-            _action: PayloadAction<{ usernameOrEmail: string; password: string }>
+            _action: PayloadAction<{ username: string; password: string }>
         ) => {
             state.status = 'loading'
             state.error = null
