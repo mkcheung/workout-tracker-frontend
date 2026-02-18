@@ -3,7 +3,7 @@ import {
     useState
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from "../../hooks";
+import { useAppDispatch, useAppSelector } from "../../hooks";
 import { uiActions } from "../../../features/ui/uiSlice";
 import { workoutActions } from "../../../features/workout/workoutSlice";
 const CreateWorkout = () => {
@@ -15,11 +15,19 @@ const CreateWorkout = () => {
         performed_at: ''
     })
 
+    const { status, lastCreatedId } = useAppSelector(s => s.workout);
+
+    useEffect(() => {
+        if (status == 'completed' && lastCreatedId) {
+            console.log('navigate to workout edit')
+            navigate(`/workout/${lastCreatedId}`)
+        }
+    }, [lastCreatedId, status])
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
         try {
-            console.log('dispatched handleSubmit')
             dispatch(workoutActions.createWorkout(formData))
         } catch (e: any) {
             const message =

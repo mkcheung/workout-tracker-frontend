@@ -11,8 +11,10 @@ function* createWorkoutWorker(action: ReturnType<typeof workoutActions.createWor
             url: "api/workouts/",
             data: action.payload,
         }))
-
-        if (res.status == 200) {
+        if (res.status == 201) {
+            console.log(res)
+            console.log(res.status)
+            yield put(workoutActions.createWorkoutSucceeded({ id: res.data.id }))
             yield put(uiActions.toastAdded({ kind: 'success', message: 'Workout created.' }));
         } else {
             yield put(uiActions.toastAdded({ kind: 'error', message: 'Error creating workout.' }));
