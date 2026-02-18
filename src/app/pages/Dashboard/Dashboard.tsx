@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../hooks";
 
 
@@ -9,6 +9,12 @@ const Dashboard = () => {
     return (
         <div>
             Dashboard
+
+            <nav className="nav">
+                <NavLink to="/workoutlist" className="navLink">
+                    Workout List
+                </NavLink>
+            </nav>
         </div>
     )
 };
