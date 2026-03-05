@@ -6,6 +6,8 @@ import type {
     PayloadAction
 } from '@reduxjs/toolkit'
 
+type ExerciseStatus = 'idle' | 'loading' | 'succeeded' | 'failed'
+
 type Exercise = {
     id: number
     name: string
@@ -17,10 +19,12 @@ type Exercise = {
 
 type ExerciseState = {
     exercises: Exercise[];
+    status: ExerciseStatus;
 }
 
 const initialState: ExerciseState = {
-    exercises: []
+    exercises: [],
+    status: 'idle'
 }
 
 export const exerciseSlice = createSlice({
@@ -29,6 +33,12 @@ export const exerciseSlice = createSlice({
     reducers: {
         loadExercises: (state, action: PayloadAction<{ exercises: Exercise[] }>) => {
             state.exercises = action.payload.exercises
+        },
+        loadSuccessful: (state) => {
+            state.status = 'succeeded'
+        },
+        loadFailed: (state) => {
+            state.status = 'failed'
         }
     }
 })
