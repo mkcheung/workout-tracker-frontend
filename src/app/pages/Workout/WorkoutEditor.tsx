@@ -20,17 +20,10 @@ const WorkoutEditor = () => {
     useEffect(() => {
         const getExercises = async () => {
             if (status === 'idle') {
-                const res: { data: any; status: number } = await client.request({
-                    method: "GET",
-                    url: "api/exercises/",
-                })
-                if (res.status === 200) {
-                    dispatch(exerciseActions.loadExercises({ exercises: res.data }))
-                    dispatch(exerciseActions.loadSuccessful())
-                } else {
-                    dispatch(exerciseActions.loadFailed())
-                    dispatch(uiActions.toastAdded({ kind: "error", message: `Error loading exercises.` }));
-                }
+                dispatch(exerciseActions.loadExercises())
+            } else {
+                dispatch(exerciseActions.loadFailed())
+                dispatch(uiActions.toastAdded({ kind: "error", message: `Error loading exercises.` }));
             }
         }
         getExercises()

@@ -31,10 +31,9 @@ export const exerciseSlice = createSlice({
     name: 'exercise',
     initialState,
     reducers: {
-        loadExercises: (state, action: PayloadAction<{ exercises: Exercise[] }>) => {
+        loadExercises: (state) => { },
+        loadSuccessful: (state, action: PayloadAction<{ exercises: Exercise[] }>) => {
             state.exercises = action.payload.exercises
-        },
-        loadSuccessful: (state) => {
             state.status = 'succeeded'
         },
         loadFailed: (state) => {

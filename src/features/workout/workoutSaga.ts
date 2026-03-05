@@ -24,5 +24,5 @@ function* createWorkoutWorker(action: ReturnType<typeof workoutActions.createWor
 }
 
 export function* workoutSaga() {
-    yield takeLatest(workoutActions.createWorkout.type, createWorkoutWorker);
+    yield takeLatest(workoutActions.createWorkout.type, createWorkoutWorker)
 }
