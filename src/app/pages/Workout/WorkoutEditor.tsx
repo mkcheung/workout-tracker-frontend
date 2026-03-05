@@ -3,6 +3,7 @@ import {
     useState
 } from "react";
 import client from "../../../api/client";
+import { exerciseActions } from "./../../../features/exercise/exerciseSlice";
 
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../hooks";
@@ -12,20 +13,18 @@ const WorkoutEditor = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-    // const [exercises, setExercises] =
-
-    useEffect(async () => {
-        console.log('load exercises')
-        const res: { data: any; status: number } = await client.request({
-            method: "GET",
-            url: "api/exercises/",
-        })
-        console.log(res)
-        if (res.status === 200) {
-            console.log('access exercises')
-            console.log(res.data)
+    useEffect(() => {
+        const getExercises = async () => {
+            const res: { data: any; status: number } = await client.request({
+                method: "GET",
+                url: "api/exercises/",
+            })
+            if (res.status === 200) {
+                dispatch(exerciseActions.loadExercises({ exercises: res.data }));
+            }
         }
-    })
+        getExercises()
+    }, [])
 
     return (
         <div>

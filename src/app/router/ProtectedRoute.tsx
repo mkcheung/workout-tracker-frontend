@@ -9,11 +9,12 @@ import {
 const ProtectedRoute = () => {
 
     const status = useAppSelector((s) => s.auth.status);
+    const token = useAppSelector((s) => s.auth.token);
 
-    if (status === 'loading') {
-        return <div>...Loading</div>
+    if (status === "idle" || status === "loading") {
+        return <div>...Loading</div>;
     }
-    if (status === 'idle') {
+    if (!token) {
         return <Navigate to="/login" replace />;
     }
 
