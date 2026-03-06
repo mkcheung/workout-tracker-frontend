@@ -19,9 +19,8 @@ const WorkoutEditor = () => {
     const dispatch = useAppDispatch()
     const status = useAppSelector((s) => s.exercise.status)
     const exercises = useAppSelector((s) => s.exercise.exercises)
-    const formSubmitable = false;
 
-    const [query, getQuery] = useState("")
+    const [query, setQuery] = useState("")
     const [selectedIds, setSelectedIds] = useState<number[]>([])
     const { id } = useParams<{ id: string }>();
 
@@ -65,6 +64,28 @@ const WorkoutEditor = () => {
         }
     }, [status, dispatch])
 
+    useEffect(() => {
+        const loadExistingWorkout = async () => {
+            try {
+                const res = await client.request({
+                    method: "GET",
+                    url: `/api/workouts/${id}/`
+                });
+                if (Array.isArray(res.data.workout_exercises) && res.data.workout_exercises.length > 0) {
+                    let original_selected_exercises = []
+                    res.data.workout_exercises.forEach(workout_exercise => {
+                        original_selected_exercises.push(workout_exercise['exercise'])
+                    })
+                    setSelectedIds(original_selected_exercises)
+                }
+            } catch (err) {
+                // setError(err);
+            }
+        };
+        loadExistingWorkout()
+    }, [])
+
+
     const selectedExercises = selectedIds.map((id) => {
         return exercises.find((exercise) => {
             return exercise.id === id
@@ -87,7 +108,7 @@ const WorkoutEditor = () => {
                                 <label>Find exercise</label>
                                 <input
                                     value={query}
-                                    onChange={(e) => getQuery(e.target.value)}
+                                    onChange={(e) => setQuery(e.target.value)}
                                     placeholder="Search…"
                                 />
 
