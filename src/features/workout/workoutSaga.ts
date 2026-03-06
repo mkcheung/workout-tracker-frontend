@@ -23,6 +23,26 @@ function* createWorkoutWorker(action: ReturnType<typeof workoutActions.createWor
     }
 }
 
+function* addExercisesToWorkout(action: ReturnType<typeof workoutActions.addExercisesToWorkout>) {
+    try {
+
+        const res: { data: any; status: number } = yield call(() => client.request({
+            method: "PUT",
+            url: `/api/workouts/${action.payload.workout_id_num}/set-exercises/`,
+            data: action.payload,
+        }))
+        if (res.status == 200) {
+            yield put(uiActions.toastAdded({ kind: 'success', message: 'Exercises added to workout.' }));
+        } else {
+            yield put(uiActions.toastAdded({ kind: 'error', message: 'Error adding exercises to workout.' }));
+        }
+
+    } catch (err) {
+        yield put(uiActions.toastAdded({ kind: 'error', message: 'Error adding exercises to workout.' }));
+    }
+}
+
 export function* workoutSaga() {
     yield takeLatest(workoutActions.createWorkout.type, createWorkoutWorker)
+    yield takeLatest(workoutActions.addExercisesToWorkout.type, addExercisesToWorkout)
 }

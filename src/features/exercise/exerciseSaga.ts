@@ -11,7 +11,6 @@ function* loadExercises(action: ReturnType<typeof exerciseActions.loadExercises>
         }))
         if (res.status == 200) {
             yield put(exerciseActions.loadSuccessful({ exercises: res.data }))
-            yield put(uiActions.toastAdded({ kind: 'success', message: 'Exercises Loaded.' }));
         } else {
             yield put(uiActions.toastAdded({ kind: 'error', message: `Error loading exercises.` }));
         }

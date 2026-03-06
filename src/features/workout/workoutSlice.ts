@@ -24,16 +24,17 @@ const initialState: WorkoutState = {
 }
 
 
+
 export const workoutSlice = createSlice({
     name: 'workout',
     initialState,
     reducers: {
         createWorkout(state, action: PayloadAction<{ notes: string, performed_at: string }>) { },
         createWorkoutSucceeded(state, action: PayloadAction<{ id: number }>) {
-            console.log('createWorkoutSucceeded')
             state.lastCreatedId = action.payload.id
             state.status = 'completed'
-        }
+        },
+        addExercisesToWorkout(state, action: PayloadAction<{ exercise_ids: number[], workout_id_num: number }>) { }
     }
 })
 export const workoutActions = workoutSlice.actions
