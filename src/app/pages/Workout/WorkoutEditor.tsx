@@ -21,39 +21,66 @@ const WorkoutEditor = () => {
     const exercises = useAppSelector((s) => s.exercise.exercises)
 
     const [query, setQuery] = useState("")
-    const [selectedIds, setSelectedIds] = useState<number[]>([])
     const { id } = useParams<{ id: string }>();
 
     const filteredExercises = exercises.filter((exercise) => {
         return exercise.name.toLowerCase().includes(query.toLowerCase())
     })
 
-    const addExercise = (id: number) => {
-        setSelectedIds((prev) => (
-            prev.includes(id) ? prev : [...prev, id]
-        ))
+    type WorkoutSet = {
+        id: number
+        workout_exercise: number
+        set_number: number
+        reps: number
+        weight: number
     }
 
-    const removeExercise = (id: number) => {
-        setSelectedIds((prev) =>
-            prev.filter((x) => x != id)
-        )
+    type WorkoutExercise = {
+        id: number
+        exercise: number
+        order: number
+        workout_sets: WorkoutSet[]
+    }
+
+    const [selectedExercises, setSelectedExercises] = useState<WorkoutExercise[]>([])
+
+    const addExercise = (exercise: any) => {
+        setSelectedExercises((prev) => {
+            if (prev.some((priorExercise) => priorExercise.exercise === exercise.id)) {
+                return prev
+            }
+
+            return [
+                ...prev,
+                {
+                    exercise_id: exercise.id,
+                    exercise_name: exercise.name,
+                    sets: [
+                        { set_number: 1, reps: "", weight: "" }
+                    ]
+                }
+            ]
+        })
+    }
+
+    const removeExercise = (exercise: any) => {
+        setSelectedExercises((prev) => prev.filter((x) => x.exercise_id !== exercise.exercise_id))
     }
 
     const moveUp = (index: number) => {
         if (index === 0) return
-        setSelectedIds((prev) => {
+        setSelectedExercises((prev) => {
             const copy = [...prev]
-            [copy[index - 1], copy[index]] = [copy[index], copy[index - 1]]
+                ;[copy[index - 1], copy[index]] = [copy[index], copy[index - 1]]
             return copy
         })
     }
 
     const moveDown = (index: number) => {
-        setSelectedIds((prev) => {
-            if (index >= prev.length - 1) return prev
+        if (index === 0) return
+        setSelectedExercises((prev) => {
             const copy = [...prev]
-            [copy[index + 1], copy[index]] = [copy[index], copy[index + 1]]
+                ;[copy[index + 1], copy[index]] = [copy[index], copy[index + 1]]
             return copy
         })
     }
@@ -71,26 +98,28 @@ const WorkoutEditor = () => {
                     method: "GET",
                     url: `/api/workouts/${id}/`
                 });
-                if (Array.isArray(res.data.workout_exercises) && res.data.workout_exercises.length > 0) {
-                    let original_selected_exercises: number[] = []
-                    res.data.workout_exercises.forEach(workout_exercise => {
-                        original_selected_exercises.push(workout_exercise['exercise'])
-                    })
-                    setSelectedIds(original_selected_exercises)
-                }
+
+                const mapped = (res.data.workout_exercises || []).map((workout_exercise: any) => {
+                    const matchedExercise = exercises.find((exercise) => exercise.id == workout_exercise.exercise)
+                    return {
+                        workout_exercise_id: workout_exercise.exercise,
+                        exercise_id: workout_exercise.exercise,
+                        exercise_name: matchedExercise?.name,
+                        sets: (workout_exercise.workout_sets || []).map((workout_set: any) => ({
+                            id: workout_set.id,
+                            set_number: workout_set.set_number,
+                            reps: String(workout_set.reps ?? ""),
+                            weight: String(workout_set.weight ?? "")
+                        }))
+                    }
+                })
+                setSelectedExercises(mapped)
             } catch (err) {
                 // setError(err);
             }
         };
         loadExistingWorkout()
-    }, [id])
-
-
-    const selectedExercises = selectedIds.map((id) => {
-        return exercises.find((exercise) => {
-            return exercise.id === id
-        })
-    })
+    }, [id, exercises])
 
     return (
         <div>
@@ -119,7 +148,7 @@ const WorkoutEditor = () => {
                                             style={{ display: "flex", justifyContent: "space-between", padding: 8 }}
                                         >
                                             <span>{exercise.name}</span>
-                                            <button type="button" onClick={() => addExercise(exercise.id)}>
+                                            <button type="button" onClick={() => addExercise(exercise)}>
                                                 Add
                                             </button>
                                         </div>
@@ -131,7 +160,7 @@ const WorkoutEditor = () => {
                             </div>
 
                             <div style={{ flex: 1 }}>
-                                <label>Selected ({selectedIds.length})</label>
+                                <label>Selected ({selectedExercises.length})</label>
 
                                 <div style={{ marginTop: 8, border: "1px solid #ddd", minHeight: 280 }}>
                                     {selectedExercises.length === 0 ? (
@@ -143,13 +172,13 @@ const WorkoutEditor = () => {
                                                 style={{ display: "flex", justifyContent: "space-between", padding: 8 }}
                                             >
                                                 <span>
-                                                    {idx + 1}. {exercise.name}
+                                                    {idx + 1}. {exercise.exercise_name}
                                                 </span>
 
                                                 <div style={{ display: "flex", gap: 8 }}>
                                                     <button type="button" onClick={() => moveUp(idx)}>↑</button>
                                                     <button type="button" onClick={() => moveDown(idx)}>↓</button>
-                                                    <button type="button" onClick={() => removeExercise(exercise.id)}>Remove</button>
+                                                    <button type="button" onClick={() => removeExercise(exercise)}>Remove</button>
                                                 </div>
                                             </div>
                                         ))
@@ -159,19 +188,31 @@ const WorkoutEditor = () => {
                         </div>
 
                         <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
-                            <button type="button" onClick={() => setSelectedIds([])}>
+                            <button type="button" onClick={() => setSelectedExercises([])}>
                                 Clear
                             </button>
 
                             <button
                                 type="button"
-                                disabled={!id ? true : false}
+                                disabled={!id || selectedExercises.length === 0 ? true : false}
                                 onClick={() => {
                                     const workoutIdNum = Number(id);
 
-                                    dispatch(workoutActions.addExercisesToWorkout({
-                                        exercise_ids: selectedIds,
-                                        workout_id_num: workoutIdNum
+                                    const payload = selectedExercises.map((exercise, index) => ({
+                                        workout_exercise_id: exercise.workout_exercise_id,
+                                        exercise_id: exercise.exercise_id,
+                                        order: index + 1,
+                                        sets: exercise.sets.map((set, setIndex) => ({
+                                            id: set.id,
+                                            set_number: setIndex + 1,
+                                            reps: Number(set.reps),
+                                            weight: set.weight === "" ? null : Number(set.weight),
+                                        })),
+                                    }));
+
+                                    dispatch(workoutActions.addWorkoutExercisesAndSets({
+                                        workout_id_num: workoutIdNum,
+                                        workout_exercises: payload,
                                     }));
                                 }}
                             >

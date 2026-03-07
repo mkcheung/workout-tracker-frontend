@@ -34,7 +34,7 @@ export const workoutSlice = createSlice({
             state.lastCreatedId = action.payload.id
             state.status = 'completed'
         },
-        addExercisesToWorkout(state, action: PayloadAction<{ exercise_ids: number[], workout_id_num: number }>) { }
+        addWorkoutExercisesAndSets(state, action: PayloadAction<{ workout_exercises: [], workout_id_num: number }>) { }
     }
 })
 export const workoutActions = workoutSlice.actions

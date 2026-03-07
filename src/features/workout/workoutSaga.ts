@@ -23,7 +23,7 @@ function* createWorkoutWorker(action: ReturnType<typeof workoutActions.createWor
     }
 }
 
-function* addExercisesToWorkout(action: ReturnType<typeof workoutActions.addExercisesToWorkout>) {
+function* addWorkoutExercisesAndSets(action: ReturnType<typeof workoutActions.addWorkoutExercisesAndSets>) {
     try {
 
         const res: { data: any; status: number } = yield call(() => client.request({
@@ -44,5 +44,5 @@ function* addExercisesToWorkout(action: ReturnType<typeof workoutActions.addExer
 
 export function* workoutSaga() {
     yield takeLatest(workoutActions.createWorkout.type, createWorkoutWorker)
-    yield takeLatest(workoutActions.addExercisesToWorkout.type, addExercisesToWorkout)
+    yield takeLatest(workoutActions.addWorkoutExercisesAndSets.type, addWorkoutExercisesAndSets)
 }
