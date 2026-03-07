@@ -72,7 +72,7 @@ const WorkoutEditor = () => {
                     url: `/api/workouts/${id}/`
                 });
                 if (Array.isArray(res.data.workout_exercises) && res.data.workout_exercises.length > 0) {
-                    let original_selected_exercises = []
+                    let original_selected_exercises: number[] = []
                     res.data.workout_exercises.forEach(workout_exercise => {
                         original_selected_exercises.push(workout_exercise['exercise'])
                     })
@@ -83,7 +83,7 @@ const WorkoutEditor = () => {
             }
         };
         loadExistingWorkout()
-    }, [])
+    }, [id])
 
 
     const selectedExercises = selectedIds.map((id) => {
