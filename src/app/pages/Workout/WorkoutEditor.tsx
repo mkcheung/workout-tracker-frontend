@@ -28,18 +28,17 @@ const WorkoutEditor = () => {
     })
 
     type WorkoutSet = {
-        id: number
-        workout_exercise: number
+        id?: number
         set_number: number
-        reps: number
-        weight: number
+        reps: string
+        weight: string
     }
 
     type WorkoutExercise = {
-        id: number
-        exercise: number
-        order: number
-        workout_sets: WorkoutSet[]
+        workout_exercise_id?: number
+        exercise_id: number
+        exercise_name: string
+        sets: WorkoutSet[]
     }
 
     const [selectedExercises, setSelectedExercises] = useState<WorkoutExercise[]>([])
@@ -121,6 +120,57 @@ const WorkoutEditor = () => {
         loadExistingWorkout()
     }, [id, exercises])
 
+    const addSet = (exerciseId: number) => {
+        setSelectedExercises((prev) => {
+            return prev.map((ex) => {
+                if (ex.exercise_id != exerciseId) {
+                    return ex
+                }
+                const nextSetNumber = ex.sets.length + 1
+
+                return {
+                    ...ex,
+                    sets: [
+                        ...ex.sets,
+                        {
+                            set_number: nextSetNumber,
+                            reps: "",
+                            weight: ""
+                        }
+                    ]
+                }
+            })
+        })
+    }
+
+    const updateSetField = (
+        exerciseId: number,
+        setIndex: number,
+        fieldName: "reps" | "weight",
+        value: string) => {
+
+        setSelectedExercises((prev) => {
+            return prev.map((ex) => {
+                if (ex.exercise_id !== exerciseId) {
+                    return ex
+                }
+
+                const newSets = ex.sets.map((set) => {
+                    if (set.set_number === setIndex) {
+                        return {
+                            ...set,
+                            set_number: setIndex,
+                            [fieldName]: value
+                        }
+                    } else {
+                        return set
+                    }
+                })
+                return { ...ex, sets: newSets }
+            })
+        })
+    }
+
     return (
         <div>
             <div className="pageHeader">
@@ -168,18 +218,89 @@ const WorkoutEditor = () => {
                                     ) : (
                                         selectedExercises.map((exercise: any, idx: number) => (
                                             <div
-                                                key={exercise.id}
-                                                style={{ display: "flex", justifyContent: "space-between", padding: 8 }}
+                                                key={exercise.workout_exercise_id ?? exercise.id}
+                                                className="card"
+                                                style={{ padding: 12, marginBottom: 12 }}
                                             >
-                                                <span>
-                                                    {idx + 1}. {exercise.exercise_name}
-                                                </span>
+                                                <div
+                                                    className="exerciseCardHeader"
+                                                    style={{
+                                                        display: "flex",
+                                                        justifyContent: "space-between",
+                                                        alignItems: "center"
+                                                    }}
+                                                >
+                                                    <strong>{idx + 1}. {exercise.exercise_name}</strong>
 
-                                                <div style={{ display: "flex", gap: 8 }}>
-                                                    <button type="button" onClick={() => moveUp(idx)}>↑</button>
-                                                    <button type="button" onClick={() => moveDown(idx)}>↓</button>
-                                                    <button type="button" onClick={() => removeExercise(exercise)}>Remove</button>
+                                                    <div style={{ display: "flex", gap: 8 }}>
+                                                        <button type="button" onClick={() => moveUp(idx)}>↑</button>
+                                                        <button type="button" onClick={() => moveDown(idx)}>↓</button>
+                                                        <button type="button" onClick={() => removeExercise(exercise)}>Remove</button>
+                                                    </div>
                                                 </div>
+
+                                                <div style={{ marginTop: 12 }}>
+                                                    {exercise.sets.length === 0 ? (
+                                                        <div style={{ opacity: 0.7, padding: 8 }}>No sets yet.</div>
+                                                    ) : (
+                                                        exercise.sets.map((set, setIndex) => (
+                                                            <div
+                                                                key={set.id ?? `${exercise.exercise_id}-${setIndex}`}
+                                                                style={{
+                                                                    display: "grid",
+                                                                    gridTemplateColumns: "60px 1fr 1fr auto",
+                                                                    gap: 8,
+                                                                    alignItems: "center",
+                                                                    marginBottom: 8
+                                                                }}
+                                                            >
+                                                                <div>Set {setIndex + 1}</div>
+
+                                                                <input
+                                                                    type="number"
+                                                                    min="1"
+                                                                    placeholder="Reps"
+                                                                    value={set.reps}
+                                                                    onChange={(e) =>
+                                                                        updateSetField(
+                                                                            exercise.exercise_id,
+                                                                            setIndex + 1,
+                                                                            "reps",
+                                                                            e.target.value
+                                                                        )
+                                                                    }
+                                                                />
+
+                                                                <input
+                                                                    type="number"
+                                                                    step="0.01"
+                                                                    min="0"
+                                                                    placeholder="Weight"
+                                                                    value={set.weight}
+                                                                    onChange={(e) =>
+                                                                        updateSetField(
+                                                                            exercise.exercise_id,
+                                                                            setIndex + 1,
+                                                                            "weight",
+                                                                            e.target.value
+                                                                        )
+                                                                    }
+                                                                />
+
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => removeSet(exercise.exercise_id, setIndex)}
+                                                                >
+                                                                    Remove Set
+                                                                </button>
+                                                            </div>
+                                                        )))
+                                                    }
+                                                </div>
+
+                                                <button type="button" onClick={() => addSet(exercise.exercise_id)}>
+                                                    Add Set
+                                                </button>
                                             </div>
                                         ))
                                     )}
