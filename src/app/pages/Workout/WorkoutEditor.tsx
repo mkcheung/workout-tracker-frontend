@@ -15,7 +15,6 @@ import { workoutActions } from "../../../features/workout/workoutSlice"
 import { useParams } from "react-router-dom"
 
 const WorkoutEditor = () => {
-    const navigate = useNavigate()
     const dispatch = useAppDispatch()
     const status = useAppSelector((s) => s.exercise.status)
     const exercises = useAppSelector((s) => s.exercise.exercises)

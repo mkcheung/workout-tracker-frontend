@@ -5,8 +5,6 @@ import {
 import type {
     PayloadAction
 } from '@reduxjs/toolkit'
-import client from "../../api/client";
-import { call, put, takeLatest } from "redux-saga/effects";
 
 type Workout = {
     id: number;

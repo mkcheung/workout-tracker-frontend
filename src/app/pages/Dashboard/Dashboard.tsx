@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { workoutActions } from "../../../features/workout/workoutSlice";
 
 
 const Dashboard = () => {
-    const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
     useEffect(() => {
