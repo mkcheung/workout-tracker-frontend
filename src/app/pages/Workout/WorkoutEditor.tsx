@@ -44,7 +44,7 @@ const WorkoutEditor = () => {
 
     const addExercise = (exercise: any) => {
         setSelectedExercises((prev) => {
-            if (prev.some((priorExercise) => priorExercise.exercise === exercise.id)) {
+            if (prev.some((priorExercise) => priorExercise.exercise_id === exercise.id)) {
                 return prev
             }
 
@@ -255,7 +255,7 @@ const WorkoutEditor = () => {
                                                     {exercise.sets.length === 0 ? (
                                                         <div style={{ opacity: 0.7, padding: 8 }}>No sets yet.</div>
                                                     ) : (
-                                                        exercise.sets.map((set, setIndex) => (
+                                                        exercise.sets.map((set: WorkoutSet, setIndex: number) => (
                                                             <div
                                                                 key={set.id ?? `${exercise.exercise_id}-${setIndex + 1}`}
                                                                 style={{
