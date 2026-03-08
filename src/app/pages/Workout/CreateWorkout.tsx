@@ -19,7 +19,6 @@ const CreateWorkout = () => {
 
     useEffect(() => {
         if (status == 'completed' && lastCreatedId) {
-            console.log('navigate to workout edit')
             navigate(`/workout/${lastCreatedId}`)
         }
     }, [lastCreatedId, status])

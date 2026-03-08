@@ -50,7 +50,6 @@ function* loadWorkoutsWorker(action: ReturnType<typeof workoutActions.loadWorkou
             url: "api/workouts/",
         }))
         if (res.status == 200) {
-            console.log(res.data)
             yield put(workoutActions.workoutsLoaded({ workouts: res.data }))
             yield put(uiActions.toastAdded({ kind: 'success', message: 'Workouts loaded.' }));
         } else {
