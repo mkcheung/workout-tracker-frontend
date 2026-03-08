@@ -13,7 +13,9 @@ import {
 import { uiActions } from "../../../features/ui/uiSlice"
 import { workoutActions } from "../../../features/workout/workoutSlice"
 import { useParams } from "react-router-dom"
-
+import type {
+    WorkoutSet
+} from "../../../features/workout/workoutSlice"
 const WorkoutEditor = () => {
     const dispatch = useAppDispatch()
     const status = useAppSelector((s) => s.exercise.status)
@@ -25,13 +27,6 @@ const WorkoutEditor = () => {
     const filteredExercises = exercises.filter((exercise) => {
         return exercise.name.toLowerCase().includes(query.toLowerCase())
     })
-
-    type WorkoutSet = {
-        id?: number
-        set_number: number
-        reps: string
-        weight: string
-    }
 
     type WorkoutExercise = {
         workout_exercise_id?: number

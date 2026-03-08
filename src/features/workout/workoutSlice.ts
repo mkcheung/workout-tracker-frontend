@@ -22,11 +22,11 @@ type WorkoutExercise = {
     workout_sets: WorkoutSet[];
 }
 
-type WorkoutSet = {
-    id: number;
-    set_number: number;
-    reps: number;
-    weight: string;
+export type WorkoutSet = {
+    id?: number
+    set_number: number
+    reps: string
+    weight: string
 }
 
 
