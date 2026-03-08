@@ -171,6 +171,19 @@ const WorkoutEditor = () => {
         })
     }
 
+    const removeSet = (exerciseId: number, setIndex: number) => {
+        setSelectedExercises((prev) => {
+            return prev.map((ex) => {
+                if (ex.exercise_id !== exerciseId) {
+                    return ex
+                }
+                const newSets = ex.sets.filter((set) => set.set_number !== setIndex)
+                return { ...ex, sets: newSets }
+            })
+        })
+    }
+
+
     return (
         <div>
             <div className="pageHeader">
@@ -245,7 +258,7 @@ const WorkoutEditor = () => {
                                                     ) : (
                                                         exercise.sets.map((set, setIndex) => (
                                                             <div
-                                                                key={set.id ?? `${exercise.exercise_id}-${setIndex}`}
+                                                                key={set.id ?? `${exercise.exercise_id}-${setIndex + 1}`}
                                                                 style={{
                                                                     display: "grid",
                                                                     gridTemplateColumns: "60px 1fr 1fr auto",
@@ -289,7 +302,7 @@ const WorkoutEditor = () => {
 
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => removeSet(exercise.exercise_id, setIndex)}
+                                                                    onClick={() => removeSet(exercise.exercise_id, setIndex + 1)}
                                                                 >
                                                                     Remove Set
                                                                 </button>
