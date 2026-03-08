@@ -114,7 +114,7 @@ const WorkoutEditor = () => {
                 })
                 setSelectedExercises(mapped)
             } catch (err) {
-                // setError(err);
+                dispatch(uiActions.toastAdded({ kind: "error", message: `Error updating workout: ${err}` }));
             }
         };
         loadExistingWorkout()
