@@ -3,7 +3,6 @@ import {
     useState
 } from "react"
 import client from "../../../api/client"
-import { exerciseActions } from "./../../../features/exercise/exerciseSlice"
 
 import { useNavigate } from "react-router-dom"
 import {
@@ -78,11 +77,6 @@ const WorkoutEditor = () => {
         })
     }
 
-    useEffect(() => {
-        if (status === 'idle') {
-            dispatch(exerciseActions.loadExercises())
-        }
-    }, [status, dispatch])
 
     useEffect(() => {
         const loadExistingWorkout = async () => {
