@@ -21,7 +21,7 @@ const Dashboard = () => {
                 {workouts?.map((element) => (
                     <li key={element.id}>
                         <NavLink to={`/workout/${element.id}`}>
-                            Workout {element.id}
+                            Workout {new Date(element.performed_at).toLocaleString()}
                         </NavLink>
                     </li>
                 ))}
