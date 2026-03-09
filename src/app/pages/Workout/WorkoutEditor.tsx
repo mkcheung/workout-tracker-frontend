@@ -35,6 +35,7 @@ const WorkoutEditor = () => {
     }
 
     const [selectedExercises, setSelectedExercises] = useState<WorkoutExercise[]>([])
+    const [performedAt, setPerformedAt] = useState<string | null>(null)
 
     const addExercise = (exercise: any) => {
         setSelectedExercises((prev) => {
@@ -100,6 +101,7 @@ const WorkoutEditor = () => {
                         }))
                     }
                 })
+                setPerformedAt(res.data.performed_at ?? null)
                 setSelectedExercises(mapped)
             } catch (err) {
                 dispatch(uiActions.toastAdded({ kind: "error", message: `Error updating workout: ${err}` }));
@@ -176,6 +178,11 @@ const WorkoutEditor = () => {
         <div>
             <div className="pageHeader">
                 <h1 className="h1">Edit Workout</h1>
+                {performedAt && (
+                    <p className="pageSubtext">
+                        {new Date(performedAt).toLocaleString()}
+                    </p>
+                )}
             </div>
 
             <div className="card" style={{ padding: 16 }}>

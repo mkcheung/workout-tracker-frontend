@@ -20,11 +20,19 @@ export default function AppLayout() {
                     <div className="brand">Workout Tracker</div>
 
                     <nav className="nav">
-                        <NavLink to="/" className={({ isActive }) => (isActive ? "navLink active" : "navLink")}>
-                            Home
-                        </NavLink>
-
-                        {!isAuthed && (
+                        {isAuthed ? (
+                            <>
+                                <NavLink to="/dashboard" className={({ isActive }) => (isActive ? "navLink active" : "navLink")}>
+                                    Dashboard
+                                </NavLink>
+                                <NavLink to="/workoutlist" className={({ isActive }) => (isActive ? "navLink active" : "navLink")}>
+                                    Workouts
+                                </NavLink>
+                                <NavLink to="/progress" className={({ isActive }) => (isActive ? "navLink active" : "navLink")}>
+                                    Progress
+                                </NavLink>
+                            </>
+                        ) : (
                             <>
                                 <NavLink to="/login" className={({ isActive }) => (isActive ? "navLink active" : "navLink")}>
                                     Login
