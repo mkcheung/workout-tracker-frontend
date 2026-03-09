@@ -1,33 +1,68 @@
 import { useState } from "react";
-import {
-    useAppDispatch,
-    useAppSelector
-} from "../../hooks";
-
+import { useAppSelector } from "../../hooks";
 import client from "../../../api/client";
+import {
+    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from "recharts";
+
+type MetricKey = 'top_set_weight' | 'estimated_1rm' | 'tonnage'
+
+type SeriesPoint = { date: string; value: number }
+type SeriesSummary = { start: number | null; latest: number | null; change: number | null }
+type SeriesResponse = {
+    exercise_id: number
+    metric: MetricKey
+    unit: string
+    points: SeriesPoint[]
+    summary: SeriesSummary
+}
+
+const METRIC_CONFIG: Record<MetricKey, { label: string; yAxisLabel: string; unit: string }> = {
+    top_set_weight: { label: 'Top Set Weight', yAxisLabel: 'Weight (lbs)',      unit: 'lbs' },
+    estimated_1rm:  { label: 'Estimated 1RM',  yAxisLabel: 'Est. 1RM (lbs)',   unit: 'lbs' },
+    tonnage:        { label: 'Tonnage',         yAxisLabel: 'Volume (lbs×reps)', unit: 'lbs×reps' },
+}
+
+const fmt = (val: number | null | undefined, unit: string) =>
+    val !== null && val !== undefined ? `${val} ${unit}` : "--";
 
 const ProgressPage = () => {
-    const dispatch = useAppDispatch()
     const exercises = useAppSelector((state) => state.exercise.exercises);
 
     const [selectedExerciseId, setSelectedExerciseId] = useState<string>("");
-    const [selectedMetric, setSelectedMetric] = useState<string>("top_set_weight");
+    const [selectedMetric, setSelectedMetric] = useState<MetricKey>("top_set_weight");
     const [fromDate, setFromDate] = useState<string>("");
     const [toDate, setToDate] = useState<string>("");
+    const [seriesData, setSeriesData] = useState<SeriesResponse | null>(null);
+    const [loading, setLoading] = useState(false);
+
+    const config = METRIC_CONFIG[selectedMetric];
+
+    const pr = seriesData && seriesData.points.length > 0
+        ? Math.max(...seriesData.points.map((p) => p.value))
+        : null;
+    const prDate = pr !== null
+        ? (seriesData?.points.find((p) => p.value === pr)?.date ?? "--")
+        : "--";
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const res = await client.request({
-            method: "GET",
-            url: `/api/insightsexercise_series/`,
-            params: {
-                exercise_id: selectedExerciseId,
-                metric: selectedMetric,
-                performed_from: fromDate,
-                performed_to: toDate
-            },
-        });
-        console.log(res)
+        setLoading(true);
+        try {
+            const res = await client.request({
+                method: "GET",
+                url: `/api/insights/exercise-series/`,
+                params: {
+                    exercise_id: selectedExerciseId,
+                    metric: selectedMetric,
+                    from: fromDate || undefined,
+                    to: toDate || undefined,
+                },
+            });
+            setSeriesData(res.data as SeriesResponse);
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -49,7 +84,7 @@ const ProgressPage = () => {
                             onChange={(e) => setSelectedExerciseId(e.target.value)}
                         >
                             <option value="">Select exercise</option>
-                            {exercises?.map((exercise: any) => (
+                            {exercises.map((exercise) => (
                                 <option key={exercise.id} value={exercise.id}>
                                     {exercise.name}
                                 </option>
@@ -62,7 +97,7 @@ const ProgressPage = () => {
                         <select
                             id="metric"
                             value={selectedMetric}
-                            onChange={(e) => setSelectedMetric(e.target.value)}
+                            onChange={(e) => setSelectedMetric(e.target.value as MetricKey)}
                         >
                             <option value="top_set_weight">Top Set Weight</option>
                             <option value="estimated_1rm">Estimated 1RM</option>
@@ -92,8 +127,8 @@ const ProgressPage = () => {
                 </div>
 
                 <div className="formActions">
-                    <button type="submit" disabled={!selectedExerciseId}>
-                        Load Progress
+                    <button type="submit" disabled={!selectedExerciseId || loading}>
+                        {loading ? "Loading..." : "Load Progress"}
                     </button>
                 </div>
             </form>
@@ -103,28 +138,47 @@ const ProgressPage = () => {
                 <div className="statsGrid">
                     <div className="statCard">
                         <p>All-Time PR</p>
-                        <h3>--</h3>
+                        <h3>{fmt(pr, config.unit)}</h3>
                     </div>
                     <div className="statCard">
                         <p>PR Date</p>
-                        <h3>--</h3>
+                        <h3>{prDate}</h3>
                     </div>
                     <div className="statCard">
                         <p>Latest</p>
-                        <h3>--</h3>
+                        <h3>{fmt(seriesData?.summary.latest, config.unit)}</h3>
                     </div>
                     <div className="statCard">
                         <p>Change</p>
-                        <h3>--</h3>
+                        <h3>
+                            {seriesData?.summary.change !== null && seriesData?.summary.change !== undefined
+                                ? `${seriesData.summary.change > 0 ? "+" : ""}${seriesData.summary.change} ${config.unit}`
+                                : "--"}
+                        </h3>
                     </div>
                 </div>
             </section>
 
             <section className="card">
-                <h2 className="h2">Chart</h2>
-                <div className="chartPlaceholder">
-                    Chart goes here
-                </div>
+                <h2 className="h2">{config.label}</h2>
+                {seriesData && seriesData.points.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={seriesData.points}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="date" />
+                            <YAxis
+                                label={{ value: config.yAxisLabel, angle: -90, position: "insideLeft" }}
+                                width={80}
+                            />
+                            <Tooltip formatter={(val: number | undefined) => val !== undefined ? [`${val} ${config.unit}`, config.label] : ["--", config.label]} />
+                            <Line type="monotone" dataKey="value" dot={false} strokeWidth={2} />
+                        </LineChart>
+                    </ResponsiveContainer>
+                ) : (
+                    <div className="chartPlaceholder">
+                        {seriesData ? "No data for selected filters." : "Select an exercise and load progress."}
+                    </div>
+                )}
             </section>
         </div>
     );
