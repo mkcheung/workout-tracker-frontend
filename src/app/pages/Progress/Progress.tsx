@@ -55,8 +55,8 @@ const ProgressPage = () => {
                 params: {
                     exercise_id: selectedExerciseId,
                     metric: selectedMetric,
-                    from: fromDate || undefined,
-                    to: toDate || undefined,
+                    performed_from: fromDate || undefined,
+                    performed_to: toDate || undefined,
                 },
             });
             setSeriesData(res.data as SeriesResponse);
