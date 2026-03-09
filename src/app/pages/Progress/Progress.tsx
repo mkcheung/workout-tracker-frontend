@@ -1,13 +1,34 @@
 import { useState } from "react";
-import { useAppSelector } from "../../hooks";
+import {
+    useAppDispatch,
+    useAppSelector
+} from "../../hooks";
+
+import client from "../../../api/client";
 
 const ProgressPage = () => {
+    const dispatch = useAppDispatch()
     const exercises = useAppSelector((state) => state.exercise.exercises);
 
     const [selectedExerciseId, setSelectedExerciseId] = useState<string>("");
     const [selectedMetric, setSelectedMetric] = useState<string>("top_set_weight");
     const [fromDate, setFromDate] = useState<string>("");
     const [toDate, setToDate] = useState<string>("");
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const res = await client.request({
+            method: "GET",
+            url: `/api/insightsexercise_series/`,
+            params: {
+                exercise_id: selectedExerciseId,
+                metric: selectedMetric,
+                performed_from: fromDate,
+                performed_to: toDate
+            },
+        });
+        console.log(res)
+    }
 
     return (
         <div className="page">
@@ -16,7 +37,7 @@ const ProgressPage = () => {
                 <p className="pageSubtext">Track PRs and exercise trends over time.</p>
             </div>
 
-            <section className="card">
+            <form onSubmit={handleSubmit} className="card">
                 <h2 className="h2">Filters</h2>
 
                 <div className="formGrid">
@@ -69,7 +90,13 @@ const ProgressPage = () => {
                         />
                     </div>
                 </div>
-            </section>
+
+                <div className="formActions">
+                    <button type="submit" disabled={!selectedExerciseId}>
+                        Load Progress
+                    </button>
+                </div>
+            </form>
 
             <section className="card">
                 <h2 className="h2">Summary</h2>
