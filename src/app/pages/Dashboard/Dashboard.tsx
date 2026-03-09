@@ -32,6 +32,11 @@ const Dashboard = () => {
                     Workout List
                 </NavLink>
             </nav>
+            <nav className="nav">
+                <NavLink to="/progress" className="navLink">
+                    Progress Page
+                </NavLink>
+            </nav>
         </div>
     )
 }

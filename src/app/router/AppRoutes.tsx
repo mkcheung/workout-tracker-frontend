@@ -12,6 +12,7 @@ import Login from "../pages/Login/Login";
 import WorkoutList from "../pages/Workout/WorkoutList";
 import CreateWorkout from "../pages/Workout/CreateWorkout";
 import WorkoutEditor from "../pages/Workout/WorkoutEditor";
+import ProgressPage from "../pages/Progress/Progress";
 
 export default function AppRoutes() {
     return (
@@ -25,6 +26,7 @@ export default function AppRoutes() {
                     <Route path="workoutlist" element={<WorkoutList />} />
                     <Route path="/workout/new" element={<CreateWorkout />} />
                     <Route path="/workout/:id" element={<WorkoutEditor />} />
+                    <Route path="progress" element={<ProgressPage />} />
                 </Route>
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
