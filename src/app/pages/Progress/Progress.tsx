@@ -18,9 +18,9 @@ type SeriesResponse = {
 }
 
 const METRIC_CONFIG: Record<MetricKey, { label: string; yAxisLabel: string; unit: string }> = {
-    top_set_weight: { label: 'Top Set Weight', yAxisLabel: 'Weight (lbs)',      unit: 'lbs' },
-    estimated_1rm:  { label: 'Estimated 1RM',  yAxisLabel: 'Est. 1RM (lbs)',   unit: 'lbs' },
-    tonnage:        { label: 'Tonnage',         yAxisLabel: 'Volume (lbs×reps)', unit: 'lbs×reps' },
+    top_set_weight: { label: 'Top Set Weight', yAxisLabel: 'Weight (lbs)', unit: 'lbs' },
+    estimated_1rm: { label: 'Estimated 1RM', yAxisLabel: 'Est. 1RM (lbs)', unit: 'lbs' },
+    tonnage: { label: 'Tonnage', yAxisLabel: 'Volume (lbs×reps)', unit: 'lbs×reps' },
 }
 
 const fmt = (val: number | null | undefined, unit: string) =>
@@ -75,13 +75,14 @@ const ProgressPage = () => {
             <form onSubmit={handleSubmit} className="card">
                 <h2 className="h2">Filters</h2>
 
-                <div className="formGrid">
-                    <div>
-                        <label htmlFor="exercise">Exercise</label>
+                <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 12 }}>
+                    <div style={{ flex: "1 1 200px" }}>
+                        <label htmlFor="exercise">Exercise <span style={{ color: "red" }}>*</span></label>
                         <select
                             id="exercise"
                             value={selectedExerciseId}
                             onChange={(e) => setSelectedExerciseId(e.target.value)}
+                            style={{ display: "block", width: "100%", marginTop: 4 }}
                         >
                             <option value="">Select exercise</option>
                             {exercises.map((exercise) => (
@@ -92,36 +93,41 @@ const ProgressPage = () => {
                         </select>
                     </div>
 
-                    <div>
-                        <label htmlFor="metric">Metric</label>
+                    <div style={{ flex: "1 1 160px" }}>
+                        <label htmlFor="metric">Metric <span style={{ color: "red" }}>*</span></label>
                         <select
                             id="metric"
                             value={selectedMetric}
                             onChange={(e) => setSelectedMetric(e.target.value as MetricKey)}
+                            style={{ display: "block", width: "100%", marginTop: 4 }}
                         >
                             <option value="top_set_weight">Top Set Weight</option>
                             <option value="estimated_1rm">Estimated 1RM</option>
                             <option value="tonnage">Tonnage</option>
                         </select>
                     </div>
+                </div>
 
+                <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-end", marginBottom: 16 }}>
                     <div>
-                        <label htmlFor="fromDate">From</label>
+                        <label htmlFor="fromDate" style={{ fontSize: 13 }}>From <span style={{ opacity: 0.5 }}>(optional)</span></label>
                         <input
                             id="fromDate"
                             type="date"
                             value={fromDate}
                             onChange={(e) => setFromDate(e.target.value)}
+                            style={{ display: "block", marginTop: 4 }}
                         />
                     </div>
-
+                    <div style={{ paddingBottom: 6, opacity: 0.5 }}>→</div>
                     <div>
-                        <label htmlFor="toDate">To</label>
+                        <label htmlFor="toDate" style={{ fontSize: 13 }}>To <span style={{ opacity: 0.5 }}>(optional)</span></label>
                         <input
                             id="toDate"
                             type="date"
                             value={toDate}
                             onChange={(e) => setToDate(e.target.value)}
+                            style={{ display: "block", marginTop: 4 }}
                         />
                     </div>
                 </div>
@@ -134,8 +140,9 @@ const ProgressPage = () => {
             </form>
 
             <section className="card">
-                <h2 className="h2">Summary</h2>
-                <div className="statsGrid">
+                <h2 className="h2">{config.label}</h2>
+
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
                     <div className="statCard">
                         <p>All-Time PR</p>
                         <h3>{fmt(pr, config.unit)}</h3>
@@ -157,12 +164,9 @@ const ProgressPage = () => {
                         </h3>
                     </div>
                 </div>
-            </section>
 
-            <section className="card">
-                <h2 className="h2">{config.label}</h2>
                 {seriesData && seriesData.points.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={360}>
                         <LineChart data={seriesData.points}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="date" />
@@ -175,8 +179,8 @@ const ProgressPage = () => {
                         </LineChart>
                     </ResponsiveContainer>
                 ) : (
-                    <div className="chartPlaceholder">
-                        {seriesData ? "No data for selected filters." : "Select an exercise and load progress."}
+                    <div className="chartPlaceholder" style={{ textAlign: "center", padding: "48px 0", opacity: 0.5 }}>
+                        {seriesData ? "No data for selected filters." : "Select an exercise and metric above, then click Load Progress."}
                     </div>
                 )}
             </section>

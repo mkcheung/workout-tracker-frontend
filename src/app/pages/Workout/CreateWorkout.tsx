@@ -2,7 +2,7 @@ import {
     useEffect,
     useState
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { uiActions } from "../../../features/ui/uiSlice";
 import { workoutActions } from "../../../features/workout/workoutSlice";
@@ -44,44 +44,50 @@ const CreateWorkout = () => {
     }
 
     return (
-        <div>
+        <div className="page">
             <div className="pageHeader">
-                <h1 className="h1">Create Workout</h1>
+                <h1 className="h1">New Workout</h1>
+                <p className="pageSubtext">Set the date and any notes before adding exercises.</p>
             </div>
 
-            <div className="card">
+            <div className="card" style={{ maxWidth: 480 }}>
                 <form className="form" onSubmit={handleSubmit}>
                     <div className="field">
-                        <div className="label">Notes</div>
+                        <label className="label" htmlFor="performed_at">Date & Time <span style={{ color: "red" }}>*</span></label>
                         <input
+                            id="performed_at"
                             className="input"
-                            name="notes"
+                            type="datetime-local"
+                            name="performed_at"
+                            value={formData.performed_at}
                             onChange={handleChange}
-                            value={formData.notes}
-                            placeholder="Workout Notes"
+                            required
                             autoFocus
                         />
                     </div>
 
-                    <div>
-                        Performed On:
+                    <div className="field">
+                        <label className="label" htmlFor="notes">Notes <span style={{ opacity: 0.5, fontSize: 13 }}>(optional)</span></label>
                         <input
-                            type="datetime-local"
-                            name='performed_at'
-                            value={formData.performed_at}
+                            id="notes"
+                            className="input"
+                            name="notes"
                             onChange={handleChange}
-                            required
+                            value={formData.notes}
+                            placeholder="e.g. Morning push session"
                         />
                     </div>
 
-                    <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 8 }}>
+                    <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 16 }}>
                         <button className="btn btnPrimary" type="submit">
-                            Submit
+                            Create &amp; Add Exercises
                         </button>
+                        <NavLink to="/dashboard" className="navLink" style={{ fontSize: 14 }}>
+                            Cancel
+                        </NavLink>
                     </div>
                 </form>
             </div>
-
         </div>
     )
 }

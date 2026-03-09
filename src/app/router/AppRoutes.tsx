@@ -8,7 +8,6 @@ import Register from "../pages/Register/register";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "../pages/Login/Login";
-import WorkoutList from "../pages/Workout/WorkoutList";
 import CreateWorkout from "../pages/Workout/CreateWorkout";
 import WorkoutEditor from "../pages/Workout/WorkoutEditor";
 import ProgressPage from "../pages/Progress/Progress";
@@ -22,7 +21,7 @@ export default function AppRoutes() {
                 <Route path="register" element={<Register />} />
                 <Route element={<ProtectedRoute />}>
                     <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="workoutlist" element={<WorkoutList />} />
+
                     <Route path="/workout/new" element={<CreateWorkout />} />
                     <Route path="/workout/:id" element={<WorkoutEditor />} />
                     <Route path="progress" element={<ProgressPage />} />

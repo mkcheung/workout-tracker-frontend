@@ -16,18 +16,19 @@ export default function AppLayout() {
     return (
         <div className="app">
             <header className="topbar">
-                <div className="container topbarInner">
-                    <div className="brand">Workout Tracker</div>
+                <div className="container topbarInner" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 
-                    <nav className="nav">
+                    <NavLink to={isAuthed ? "/dashboard" : "/login"} className="brand" style={{ textDecoration: "none" }}>
+                        Workout Tracker
+                    </NavLink>
+
+                    <nav className="nav" style={{ display: "flex", gap: 24 }}>
                         {isAuthed ? (
                             <>
                                 <NavLink to="/dashboard" className={({ isActive }) => (isActive ? "navLink active" : "navLink")}>
                                     Dashboard
                                 </NavLink>
-                                <NavLink to="/workoutlist" className={({ isActive }) => (isActive ? "navLink active" : "navLink")}>
-                                    Workouts
-                                </NavLink>
+
                                 <NavLink to="/progress" className={({ isActive }) => (isActive ? "navLink active" : "navLink")}>
                                     Progress
                                 </NavLink>
@@ -44,18 +45,19 @@ export default function AppLayout() {
                         )}
                     </nav>
 
-                    <div style={{ flex: 1 }} />
-
                     <div className="topbarRight">
                         {isAuthed && (
                             <>
-                                <span className="mutedText">{user?.email}</span>
+                                <span className="mutedText">
+                                    {user?.first_name || user?.username}
+                                </span>
                                 <button className="btn btnGhost" onClick={logout}>
                                     Logout
                                 </button>
                             </>
                         )}
                     </div>
+
                 </div>
             </header>
 
